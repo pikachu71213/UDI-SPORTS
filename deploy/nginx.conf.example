@@ -1,0 +1,91 @@
+##
+# UDIISA production nginx reference config.
+# 1. Copy to /etc/nginx/sites-available/ and symlink to sites-enabled
+# 2. Set SSL paths (e.g. Let's Encrypt) and run: nginx -t && systemctl reload nginx
+##
+
+server {
+  listen 80;
+  server_name udisports.in www.udisports.in;
+  return 301 https://$host$request_uri;
+}
+
+server {
+  listen 443 ssl http2;
+  server_name udisports.in www.udisports.in;
+
+  # SSL: uncomment and set paths (e.g. certbot places them here)
+  ssl_certificate     /etc/letsencrypt/live/udisports.in/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/udisports.in/privkey.pem;
+  ssl_session_timeout 1d;
+  ssl_session_cache shared:SSL:50m;
+  ssl_protocols TLSv1.2 TLSv1.3;
+  ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+
+  # Security headers
+  add_header X-Frame-Options "SAMEORIGIN" always;
+  add_header X-Content-Type-Options "nosniff" always;
+  add_header X-XSS-Protection "1; mode=block" always;
+  add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+  root /var/www/udiisa-website/webfrontend/dist;
+  index index.html;
+
+  gzip on;
+  gzip_comp_level 6;
+  gzip_min_length 1024;
+  gzip_vary on;
+  gzip_proxied any;
+  gzip_types text/plain text/css text/javascript application/javascript application/json application/xml image/svg+xml;
+
+  # Avoid 431 on clients with larger cookie/header sets (common on Safari/Mac).
+  client_header_buffer_size 8k;
+  large_client_header_buffers 4 32k;
+  # Keep body allowance aligned with backend multer limit (10MB) with safety buffer.
+  client_max_body_size 10m;
+
+  # API and uploads first (proxy to Node)
+  location /api/ {
+    proxy_pass http://127.0.0.1:5000;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 60s;
+    proxy_connect_timeout 10s;
+    add_header Cache-Control "no-store";
+  }
+
+  location /uploads/ {
+    proxy_pass http://127.0.0.1:5000;
+    proxy_set_header Host $host;
+    add_header Cache-Control "public, max-age=604800";
+  }
+
+  # Admin SPA (built with base: /admin/)
+  location /admin/ {
+    alias /var/www/udiisa-website/admin/dist/;
+    try_files $uri $uri/ /admin/index.html;
+    add_header Cache-Control "public, max-age=300, must-revalidate";
+  }
+  location = /admin {
+    return 301 /admin/;
+  }
+
+  # Website static assets
+  location ~* \.(?:js|mjs|css|map|woff2?|ttf|eot|svg|png|jpg|jpeg|gif|webp|avif|ico)$ {
+    add_header Cache-Control "public, max-age=31536000, immutable";
+    try_files $uri =404;
+  }
+
+  location ~* \.html$ {
+    add_header Cache-Control "public, max-age=300, must-revalidate";
+    try_files $uri =404;
+  }
+
+  # Website SPA fallback
+  location / {
+    try_files $uri /index.html;
+    add_header Cache-Control "public, max-age=300, must-revalidate";
+  }
+}

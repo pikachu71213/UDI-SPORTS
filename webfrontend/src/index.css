@@ -1,0 +1,18 @@
+body { font-family: 'Plus Jakarta Sans', sans-serif; }
+@import "tailwindcss";
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgb(240, 90, 26), rgb(255, 125, 66));
+  border-radius: 10px;
+  background-clip: content-box;
+}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
