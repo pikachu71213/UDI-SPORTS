@@ -1,7 +1,7 @@
 import React from 'react'
 import { FaStar, FaUserCircle } from 'react-icons/fa'
 import { FaQuoteLeft } from 'react-icons/fa6'
-import suniljalan from "@/assets/images/sunil-jalan.webp"
+import suniljalan from "https://res.cloudinary.com/dukbkeh4p/image/upload/v1780519987/professional_fcupzz.png"
 
 const Leadership = () => {
   return (
@@ -85,7 +85,7 @@ const Leadership = () => {
                   fontSize: "clamp(28px, 5vw, 52px)",
                 }}
               >
-                Mr. Sunil Jalan
+                Mr. Aryan
               </h2>
 
               {/* Orange underline */}
