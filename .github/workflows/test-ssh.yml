@@ -1,14 +1,16 @@
-name: Test SSH
+name: Deploy UDI Sports
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
-  test:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: SSH Test
+      - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -17,6 +19,28 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
 
           script: |
-            whoami
-            pwd
-            ls /var/www
+            set -e
+
+            cd /var/www/UDI-SPORTS
+
+            echo "Pulling latest code..."
+            git pull origin main
+
+            echo "Building Frontend..."
+            cd webfrontend
+            npm ci
+            npm run build
+
+            echo "Building Admin..."
+            cd ../admin
+            npm ci
+            npm run build
+
+            echo "Updating Backend..."
+            cd ../backend
+            npm ci
+
+            echo "Reloading PM2..."
+            pm2 reload udisports-api
+
+            echo "Deployment completed"
