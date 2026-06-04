@@ -85,7 +85,7 @@ const Leadership = () => {
                   fontSize: "clamp(28px, 5vw, 52px)",
                 }}
               >
-                Mr. Aryan
+                Mr. Aryan Saini
               </h2>
 
               {/* Orange underline */}
