@@ -57,6 +57,28 @@ const Footer = () => {
         .c-item:hover { transform: translateX(4px); }
         .c-item:hover .c-icon { color: #FF7D42 !important; }
 
+        @keyframes glow-pulse {
+          0%, 100% { text-shadow: 0 0 10px rgba(240,90,26,.5), 0 0 20px rgba(255,125,66,.3); }
+          50% { text-shadow: 0 0 20px rgba(240,90,26,.8), 0 0 40px rgba(255,125,66,.6); }
+        }
+        .credit-badge {
+          display: inline-block;
+          background: linear-gradient(135deg, rgba(240,90,26,.15), rgba(255,125,66,.1));
+          border: 1px solid rgba(240,90,26,.3);
+          border-radius: 20px;
+          padding: 6px 14px;
+          font-size: 11px;
+          letter-spacing: 1px;
+          font-weight: 600;
+          color: rgba(255,255,255,.8);
+          backdrop-filter: blur(10px);
+          animation: glow-pulse 2.5s ease-in-out infinite;
+        }
+        .credit-badge:hover {
+          background: linear-gradient(135deg, rgba(240,90,26,.25), rgba(255,125,66,.15));
+          border-color: rgba(240,90,26,.6);
+        }
+
         @keyframes shim {
           0%   { background-position: 0% 50%; }
           100% { background-position: 200% 50%; }
@@ -175,9 +197,15 @@ const Footer = () => {
             <p className="!m-0" style={{ fontSize: 11.5, color: 'rgba(255,255,255,.3)', fontWeight: 400 }}>
               © {new Date().getFullYear()} UDIISA NGO. All rights reserved.
             </p>
-            <p className="!m-0" style={{ fontSize: 11, color: 'rgba(255,255,255,.2)' }}>
-              CIN No. U94990HR2026NPL141182
-            </p>
+            <div className="!flex !items-center !gap-[12px] !flex-wrap">
+              <p className="!m-0" style={{ fontSize: 11, color: 'rgba(255,255,255,.2)' }}>
+                CIN No. U94990HR2026NPL141182
+              </p>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,.15)' }}>•</span>
+              <span className="credit-badge">
+                ✨ Crafted by Aryan & Gopal
+              </span>
+            </div>
           </div>
         </div>
 
